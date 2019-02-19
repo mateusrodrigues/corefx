@@ -388,6 +388,37 @@ internal static partial class Interop
             return info;
         }
 
+        static public unsafe System.Diagnostics.Process GetParentProcessByChildId(int pid)
+        {
+            kinfo_proc* kinfo = null;
+            int count;
+            System.Diagnostics.Process parentProcess = null;
+
+            // Negative PIDs are invalid
+            if (pid < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pid));
+            }
+
+            try
+            {
+                kinfo = GetProcInfo(pid, true, out count);
+                if (kinfo == null || count < 1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(pid));
+                }
+
+                // Get the parent process information for the specified pid
+                parentProcess = System.Diagnostics.Process.GetProcessById(kinfo->ki_ppid);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal((IntPtr)kinfo);
+            }
+
+            return parentProcess;
+        }
+
         /// <summary>
         /// Gets the process information for a given process
         /// </summary>

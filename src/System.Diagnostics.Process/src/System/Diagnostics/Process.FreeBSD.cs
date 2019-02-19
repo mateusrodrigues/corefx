@@ -65,7 +65,7 @@ namespace System.Diagnostics
 
         /// <summary>Gets parent process ID</summary>
         private int ParentProcessId =>
-            throw new PlatformNotSupportedException();
+            Interop.Process.GetParentProcessByChildId(_processId).Id;
 
         // <summary>Gets execution path</summary>
         private string GetPathToOpenFile()
